@@ -1,2 +1,737 @@
-# gray-nanice-59.tiiny.site
-tic tac to, snake and flppybird game
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub - Multiple 2D Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .game-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .game-btn {
+            padding: 12px 20px;
+            font-size: 1em;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            background: white;
+            color: #667eea;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .game-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-3px);
+        }
+
+        .game-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .game-container {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .game-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ===== TIC-TAC-TOE ===== */
+        .tictactoe-info {
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+            min-height: 30px;
+        }
+
+        .tictactoe-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            aspect-ratio: 1;
+        }
+
+        .cell {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 2.5em;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+
+        .cell:hover:not(.played) {
+            background: #e8e8e8;
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .cell.x {
+            color: #667eea;
+        }
+
+        .cell.o {
+            color: #764ba2;
+        }
+
+        .cell.played {
+            cursor: not-allowed;
+        }
+
+        /* ===== SNAKE GAME ===== */
+        .snake-info {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .snake-score {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.5em;
+        }
+
+        #snakeCanvas {
+            display: block;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1;
+        }
+
+        .snake-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .snake-controls button {
+            padding: 10px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .snake-controls button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .snake-hint {
+            text-align: center;
+            color: #666;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        /* ===== FLAPPY BIRD ===== */
+        #flappyCanvas {
+            display: block;
+            margin: 20px auto;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .flappy-info {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .flappy-score {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.5em;
+        }
+
+        .flappy-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .flappy-controls button {
+            padding: 10px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .flappy-controls button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .flappy-hint {
+            text-align: center;
+            color: #666;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        /* ===== COMMON ===== */
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .game-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cell {
+                font-size: 2em;
+            }
+
+            .tictactoe-info, .snake-info, .flappy-info {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Game Hub</h1>
+            <p class="subtitle">Play Multiple 2D Games</p>
+        </header>
+
+        <div class="game-selector">
+            <button class="game-btn active" onclick="switchGame('tictactoe')">Tic-Tac-Toe</button>
+            <button class="game-btn" onclick="switchGame('snake')">Snake</button>
+            <button class="game-btn" onclick="switchGame('flappy')">Flappy Bird</button>
+        </div>
+
+        <!-- TIC-TAC-TOE GAME -->
+        <div id="tictactoe" class="game-container active">
+            <div class="tictactoe-info" id="tictactoeStatus">Player X's Turn</div>
+            <div class="tictactoe-board" id="tictactoeBoard">
+                <div class="cell" onclick="playTictactoe(0)"></div>
+                <div class="cell" onclick="playTictactoe(1)"></div>
+                <div class="cell" onclick="playTictactoe(2)"></div>
+                <div class="cell" onclick="playTictactoe(3)"></div>
+                <div class="cell" onclick="playTictactoe(4)"></div>
+                <div class="cell" onclick="playTictactoe(5)"></div>
+                <div class="cell" onclick="playTictactoe(6)"></div>
+                <div class="cell" onclick="playTictactoe(7)"></div>
+                <div class="cell" onclick="playTictactoe(8)"></div>
+            </div>
+            <button class="reset-btn" onclick="resetTictactoe()">New Game</button>
+        </div>
+
+        <!-- SNAKE GAME -->
+        <div id="snake" class="game-container">
+            <div class="snake-info">Score: <span class="snake-score" id="snakeScore">0</span></div>
+            <div class="snake-controls">
+                <button onclick="snakeStartGame()">Start</button>
+                <button onclick="snakePauseGame()">Pause</button>
+                <button onclick="snakeResetGame()">Reset</button>
+            </div>
+            <canvas id="snakeCanvas" width="300" height="300"></canvas>
+            <div class="snake-hint">⬆️ ⬇️ ⬅️ ➡️ Use Arrow Keys to control</div>
+        </div>
+
+        <!-- FLAPPY BIRD GAME -->
+        <div id="flappy" class="game-container">
+            <div class="flappy-info">Score: <span class="flappy-score" id="flappyScore">0</span></div>
+            <div class="flappy-controls">
+                <button onclick="flappyStartGame()">Start</button>
+                <button onclick="flappyResetGame()">Reset</button>
+            </div>
+            <canvas id="flappyCanvas" width="300" height="400"></canvas>
+            <div class="flappy-hint">Click or Press SPACE to make the bird jump</div>
+        </div>
+    </div>
+
+    <script>
+        // ===== GAME SWITCHER =====
+        function switchGame(game) {
+            document.querySelectorAll('.game-container').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.game-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(game).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (game === 'snake') {
+                initSnakeGame();
+            } else if (game === 'flappy') {
+                initFlappyGame();
+            }
+        }
+
+        // ===== TIC-TAC-TOE GAME =====
+        let tictactoeBoard = ['', '', '', '', '', '', '', '', ''];
+        let tictactoeCurrentPlayer = 'X';
+        let tictactoeGameActive = true;
+
+        const tictactoeWinningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        function playTictactoe(index) {
+            if (!tictactoeGameActive || tictactoeBoard[index] !== '') return;
+
+            tictactoeBoard[index] = tictactoeCurrentPlayer;
+            const cells = document.querySelectorAll('#tictactoeBoard .cell');
+            cells[index].textContent = tictactoeCurrentPlayer;
+            cells[index].classList.add(tictactoeCurrentPlayer.toLowerCase());
+            cells[index].classList.add('played');
+
+            if (checkTictactoeWinner()) {
+                document.getElementById('tictactoeStatus').textContent = `🎉 Player ${tictactoeCurrentPlayer} Wins!`;
+                tictactoeGameActive = false;
+                return;
+            }
+
+            if (tictactoeBoard.every(cell => cell !== '')) {
+                document.getElementById('tictactoeStatus').textContent = "🤝 It's a Draw!";
+                tictactoeGameActive = false;
+                return;
+            }
+
+            tictactoeCurrentPlayer = tictactoeCurrentPlayer === 'X' ? 'O' : 'X';
+            document.getElementById('tictactoeStatus').textContent = `Player ${tictactoeCurrentPlayer}'s Turn`;
+        }
+
+        function checkTictactoeWinner() {
+            return tictactoeWinningConditions.some(condition => {
+                return condition.every(index => tictactoeBoard[index] === tictactoeCurrentPlayer);
+            });
+        }
+
+        function resetTictactoe() {
+            tictactoeBoard = ['', '', '', '', '', '', '', '', ''];
+            tictactoeCurrentPlayer = 'X';
+            tictactoeGameActive = true;
+            document.getElementById('tictactoeStatus').textContent = "Player X's Turn";
+            document.querySelectorAll('#tictactoeBoard .cell').forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('x', 'o', 'played');
+            });
+        }
+
+        // ===== SNAKE GAME =====
+        let snakeGame = {
+            canvas: null,
+            ctx: null,
+            snake: [],
+            food: null,
+            direction: { x: 1, y: 0 },
+            nextDirection: { x: 1, y: 0 },
+            score: 0,
+            gameRunning: false,
+            gamePaused: false,
+            gameLoop: null,
+            gridSize: 20,
+            tileCount: 0
+        };
+
+        function initSnakeGame() {
+            snakeGame.canvas = document.getElementById('snakeCanvas');
+            snakeGame.ctx = snakeGame.canvas.getContext('2d');
+            snakeGame.tileCount = snakeGame.canvas.width / snakeGame.gridSize;
+            snakeGame.snake = [
+                { x: 5, y: Math.floor(snakeGame.tileCount / 2) },
+                { x: 4, y: Math.floor(snakeGame.tileCount / 2) },
+                { x: 3, y: Math.floor(snakeGame.tileCount / 2) }
+            ];
+            snakeGame.direction = { x: 1, y: 0 };
+            snakeGame.nextDirection = { x: 1, y: 0 };
+            snakeGame.score = 0;
+            snakeGame.gameRunning = false;
+            snakeGame.gamePaused = false;
+            generateSnakeFood();
+            drawSnakeGame();
+        }
+
+        function generateSnakeFood() {
+            snakeGame.food = {
+                x: Math.floor(Math.random() * snakeGame.tileCount),
+                y: Math.floor(Math.random() * snakeGame.tileCount)
+            };
+        }
+
+        function handleSnakeKeyPress(e) {
+            if (!snakeGame.gameRunning) return;
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (snakeGame.direction.y === 0) snakeGame.nextDirection = { x: 0, y: -1 };
+                    break;
+                case 'ArrowDown':
+                    if (snakeGame.direction.y === 0) snakeGame.nextDirection = { x: 0, y: 1 };
+                    break;
+                case 'ArrowLeft':
+                    if (snakeGame.direction.x === 0) snakeGame.nextDirection = { x: -1, y: 0 };
+                    break;
+                case 'ArrowRight':
+                    if (snakeGame.direction.x === 0) snakeGame.nextDirection = { x: 1, y: 0 };
+                    break;
+            }
+        }
+
+        function updateSnakeGame() {
+            if (!snakeGame.gameRunning || snakeGame.gamePaused) return;
+
+            snakeGame.direction = snakeGame.nextDirection;
+            const head = snakeGame.snake[0];
+            const newHead = {
+                x: (head.x + snakeGame.direction.x + snakeGame.tileCount) % snakeGame.tileCount,
+                y: (head.y + snakeGame.direction.y + snakeGame.tileCount) % snakeGame.tileCount
+            };
+
+            if (snakeGame.snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+                snakeEndGame();
+                return;
+            }
+
+            snakeGame.snake.unshift(newHead);
+
+            if (newHead.x === snakeGame.food.x && newHead.y === snakeGame.food.y) {
+                snakeGame.score += 10;
+                document.getElementById('snakeScore').textContent = snakeGame.score;
+                generateSnakeFood();
+            } else {
+                snakeGame.snake.pop();
+            }
+
+            drawSnakeGame();
+        }
+
+        function drawSnakeGame() {
+            snakeGame.ctx.fillStyle = '#f5f7fa';
+            snakeGame.ctx.fillRect(0, 0, snakeGame.canvas.width, snakeGame.canvas.height);
+
+            snakeGame.ctx.fillStyle = '#667eea';
+            snakeGame.snake.forEach((segment, index) => {
+                snakeGame.ctx.fillRect(
+                    segment.x * snakeGame.gridSize + 1,
+                    segment.y * snakeGame.gridSize + 1,
+                    snakeGame.gridSize - 2,
+                    snakeGame.gridSize - 2
+                );
+            });
+
+            snakeGame.ctx.fillStyle = '#e74c3c';
+            snakeGame.ctx.fillRect(
+                snakeGame.food.x * snakeGame.gridSize + 1,
+                snakeGame.food.y * snakeGame.gridSize + 1,
+                snakeGame.gridSize - 2,
+                snakeGame.gridSize - 2
+            );
+        }
+
+        function snakeStartGame() {
+            if (!snakeGame.gameRunning) {
+                snakeGame.gameRunning = true;
+                snakeGame.gamePaused = false;
+                snakeGame.gameLoop = setInterval(updateSnakeGame, 100);
+            } else if (snakeGame.gamePaused) {
+                snakeGame.gamePaused = false;
+            }
+        }
+
+        function snakePauseGame() {
+            snakeGame.gamePaused = !snakeGame.gamePaused;
+        }
+
+        function snakeResetGame() {
+            clearInterval(snakeGame.gameLoop);
+            initSnakeGame();
+        }
+
+        function snakeEndGame() {
+            clearInterval(snakeGame.gameLoop);
+            snakeGame.gameRunning = false;
+            snakeGame.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            snakeGame.ctx.fillRect(0, 0, snakeGame.canvas.width, snakeGame.canvas.height);
+            snakeGame.ctx.fillStyle = 'white';
+            snakeGame.ctx.font = 'bold 24px Arial';
+            snakeGame.ctx.textAlign = 'center';
+            snakeGame.ctx.fillText('Game Over!', snakeGame.canvas.width / 2, snakeGame.canvas.height / 2 - 10);
+            snakeGame.ctx.font = '16px Arial';
+            snakeGame.ctx.fillText(`Score: ${snakeGame.score}`, snakeGame.canvas.width / 2, snakeGame.canvas.height / 2 + 20);
+        }
+
+        // ===== FLAPPY BIRD GAME =====
+        let flappyGame = {
+            canvas: null,
+            ctx: null,
+            bird: null,
+            pipes: [],
+            score: 0,
+            gameRunning: false,
+            gameLoop: null,
+            gravity: 0.5,
+            flapStrength: -12,
+            pipeGap: 120,
+            pipeWidth: 60,
+            pipeSpeed: 4
+        };
+
+        class Bird {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 12;
+                this.velocity = 0;
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#FFA500';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            update() {
+                this.velocity += flappyGame.gravity;
+                this.y += this.velocity;
+            }
+
+            flap() {
+                this.velocity = flappyGame.flapStrength;
+            }
+        }
+
+        class Pipe {
+            constructor(x, height) {
+                this.x = x;
+                this.topHeight = height;
+                this.width = flappyGame.pipeWidth;
+                this.gap = flappyGame.pipeGap;
+                this.scored = false;
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = '#2ecc71';
+                ctx.fillRect(this.x, 0, this.width, this.topHeight);
+                ctx.fillRect(this.x, this.topHeight + this.gap, this.width, ctx.canvas.height - this.topHeight - this.gap);
+            }
+
+            update() {
+                this.x -= flappyGame.pipeSpeed;
+            }
+        }
+
+        function initFlappyGame() {
+            flappyGame.canvas = document.getElementById('flappyCanvas');
+            flappyGame.ctx = flappyGame.canvas.getContext('2d');
+            flappyGame.bird = new Bird(flappyGame.canvas.width / 4, flappyGame.canvas.height / 2);
+            flappyGame.pipes = [];
+            flappyGame.score = 0;
+            flappyGame.gameRunning = false;
+            drawFlappyGame();
+            document.addEventListener('keydown', handleFlappyKeyPress);
+            flappyGame.canvas.addEventListener('click', handleFlappyClick);
+        }
+
+        function handleFlappyKeyPress(e) {
+            if (e.code === 'Space' && flappyGame.gameRunning) {
+                flappyGame.bird.flap();
+            }
+        }
+
+        function handleFlappyClick(e) {
+            if (flappyGame.gameRunning) {
+                flappyGame.bird.flap();
+            }
+        }
+
+        function updateFlappyGame() {
+            if (!flappyGame.gameRunning) return;
+
+            flappyGame.bird.update();
+
+            if (flappyGame.bird.y - flappyGame.bird.radius < 0 || flappyGame.bird.y + flappyGame.bird.radius > flappyGame.canvas.height) {
+                flappyEndGame();
+                return;
+            }
+
+            if (flappyGame.pipes.length === 0 || flappyGame.pipes[flappyGame.pipes.length - 1].x < flappyGame.canvas.width - 150) {
+                const randomHeight = Math.random() * (flappyGame.canvas.height - flappyGame.pipeGap - 50) + 30;
+                flappyGame.pipes.push(new Pipe(flappyGame.canvas.width, randomHeight));
+            }
+
+            flappyGame.pipes.forEach((pipe, index) => {
+                pipe.update();
+
+                if (pipe.x + pipe.width < flappyGame.bird.x && !pipe.scored) {
+                    flappyGame.score++;
+                    pipe.scored = true;
+                    document.getElementById('flappyScore').textContent = flappyGame.score;
+                }
+
+                if (checkFlappyCollision(pipe)) {
+                    flappyEndGame();
+                }
+
+                if (pipe.x + pipe.width < 0) {
+                    flappyGame.pipes.splice(index, 1);
+                }
+            });
+
+            drawFlappyGame();
+        }
+
+        function checkFlappyCollision(pipe) {
+            return flappyGame.bird.x + flappyGame.bird.radius > pipe.x &&
+                   flappyGame.bird.x - flappyGame.bird.radius < pipe.x + pipe.width &&
+                   (flappyGame.bird.y - flappyGame.bird.radius < pipe.topHeight ||
+                    flappyGame.bird.y + flappyGame.bird.radius > pipe.topHeight + pipe.gap);
+        }
+
+        function drawFlappyGame() {
+            flappyGame.ctx.fillStyle = '#87CEEB';
+            flappyGame.ctx.fillRect(0, 0, flappyGame.canvas.width, flappyGame.canvas.height);
+
+            flappyGame.pipes.forEach(pipe => pipe.draw(flappyGame.ctx));
+            flappyGame.bird.draw(flappyGame.ctx);
+        }
+
+        function flappyStartGame() {
+            if (!flappyGame.gameRunning) {
+                flappyGame.gameRunning = true;
+                flappyGame.gameLoop = setInterval(updateFlappyGame, 30);
+            }
+        }
+
+        function flappyResetGame() {
+            clearInterval(flappyGame.gameLoop);
+            initFlappyGame();
+        }
+
+        function flappyEndGame() {
+            clearInterval(flappyGame.gameLoop);
+            flappyGame.gameRunning = false;
+            flappyGame.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            flappyGame.ctx.fillRect(0, 0, flappyGame.canvas.width, flappyGame.canvas.height);
+            flappyGame.ctx.fillStyle = 'white';
+            flappyGame.ctx.font = 'bold 28px Arial';
+            flappyGame.ctx.textAlign = 'center';
+            flappyGame.ctx.fillText('Game Over!', flappyGame.canvas.width / 2, flappyGame.canvas.height / 2 - 20);
+            flappyGame.ctx.font = '18px Arial';
+            flappyGame.ctx.fillText(`Score: ${flappyGame.score}`, flappyGame.canvas.width / 2, flappyGame.canvas.height / 2 + 20);
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            initSnakeGame();
+        });
+    </script>
+</body>
+</html>
